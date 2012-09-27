@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from numpy.lib.stride_tricks import as_strided as ast
@@ -53,14 +52,16 @@ class Patches(object):
         x  = np.array([])
         for ii in range(self.pside):
             x = np.append(x,np.arange(1,self.pside+1))
+        x -= np.mean(x)
 
         y  = np.array([])
         for ii in range(self.pside):
             y = np.append(y,np.zeros(self.pside)+ii+1)
+        y -= np.mean(y)
 
-        self.xc = np.sum(x * self.data,axis=1)/self.data.sum(axis=1)
-        self.yc = np.sum(y * self.data,axis=1)/self.data.sum(axis=1)
-
+        denom = np.sum(self.data, axis=1)
+        self.xc = np.sum(x * self.data,axis=1) / denom
+        self.yc = np.sum(y * self.data,axis=1) / denom
 
     def flip_y(self,ind):
         """
@@ -92,17 +93,10 @@ class Patches(object):
         """
         self.centroid()
         
-        if (self.pside % 2) == 0:
-            xt, yt = (self.pside+1.)/2., (self.pside+1.)/2.
-            st, at = 0.,self.pside
-        else:
-            xt, yt = self.pside/2., self.pside/2.
-            st, at = 0.,self.pside+1.
-
-        ind_x = (self.xc >= xt)
-        ind_y = (self.yc >= yt)
-        ind_s = (self.xc-self.yc >= st)
-        ind_a = (self.yc+self.xc >= at)
+        ind_x = (self.xc >= 0)
+        ind_y = (self.yc >= 0)
+        ind_s = (self.xc-self.yc >= 0)
+        ind_a = (self.yc+self.xc >= 0)
         
         # Sect 1 = y=x axis flip
         ind = (ind_x==1) & (ind_y==1) & (ind_s==1) & (ind_a==1)
