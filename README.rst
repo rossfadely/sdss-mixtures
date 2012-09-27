@@ -7,9 +7,9 @@ SDSS images.
 Authors
 ---------
 
-Ross Fadely
-Rob Fergus
-Dan Foreman-Mackey
-David W. Hogg
-Dilip Krishnan
+- Ross Fadely
+- Rob Fergus
+- Dan Foreman-Mackey
+- David W. Hogg
+- Dilip Krishnan
 
