@@ -14,13 +14,13 @@ Authors
 - Dilip Krishnan
 
 Setting up virtualenv
-=============
+----------------
 
 Set up the virtual environment:
 
 ::
 
-virtualenv venv --distribute
+    virtualenv venv --distribute
 
 This makes a folder ``venv``.  
 
@@ -30,16 +30,16 @@ To jump into the virtual environment:
 
 ::
 
-. venv/bin/activate
+    . venv/bin/activate
 
 For your first session in the environment, you'll need to install your dependencies:
 
 ::
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 To exit the environment:
 
 ::
 
-deactivate
+    deactivate
