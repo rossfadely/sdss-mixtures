@@ -20,9 +20,7 @@ Set up the virtual environment:
 
 ::
 
-::
-
-virtualenv venv --distribute
+:: virtualenv venv --distribute
 
 This makes a folder ``venv``.  
 
