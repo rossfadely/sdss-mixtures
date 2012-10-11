@@ -14,7 +14,7 @@ Authors
 - Dilip Krishnan
 
 Setting up virtualenv
------------------
+=============
 
 Set up the virtual environment:
 
