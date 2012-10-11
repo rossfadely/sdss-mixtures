@@ -22,7 +22,7 @@ Set up the virtual environment:
 
 virtualenv venv --distribute
 
-This makes a folder `venv`.  
+This makes a folder ``venv``.  
 
 Construct requirements.txt (see example).
 
