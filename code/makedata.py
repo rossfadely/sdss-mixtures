@@ -4,7 +4,7 @@ import scipy as sp
 from sdss_mixtures_utils import *
 from patch import *
 
-run = [8055]
+run = [8055] # this should read from the sdss run list
 field = [97,98,99,100]
 camcol = [1,2,3,4,5,6]
 
@@ -41,6 +41,9 @@ for r in run:
 
                     ind = np.random.permutation(len(td[:Nhi,0]))
                     ind = ind[:Nlo]
+
+                    print 'var',tv[Nhi]
+                    assert False
 
                     out = np.concatenate((td[ind],td[Nhi:]),axis=0)
                     out = out[np.random.permutation(len(out[:,0])),:]
