@@ -6,3 +6,12 @@ dist
 *.egg-info
 *~
 *.png
+*.fit
+*.bz2
+*.pkl
+*.fits
+*.gz
+*.aux
+*.log
+*.out
+foo*
