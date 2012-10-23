@@ -185,13 +185,17 @@ def fig_mofa(mix,kmeans,filename):
         mpatch  = mix.means[k].reshape(pshape)
         kmpatch = kmeans[k,:].reshape(pshape)
         ax = fig.add_subplot(L+1,L,L)
-        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(kmpatch)*1.0001,
+                  vmax=np.max(kmpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Initial Mean',
                 transform=ax.transAxes,ha='center',va='center')
         ax = fig.add_subplot(L+1,L,1)
-        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.imshow(mpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(mpatch)*1.0001,
+                  vmax=np.max(mpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Final Mean',
@@ -211,7 +215,10 @@ def fig_mofa(mix,kmeans,filename):
                 fontsize=35)
 
         ax = fig.add_subplot(L+2,L,L+1)
-        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.imshow(mix.psis[k].reshape(pshape),
+                  origin='lower',interpolation='nearest',
+                  vmin=np.min(mix.psis[k])*1.0001,
+                  vmax=np.max(mix.psis[k])*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.05,'Psi',
@@ -219,7 +226,10 @@ def fig_mofa(mix,kmeans,filename):
             
         for ii in range(mix.M):
             ax = fig.add_subplot(L+2,L,L+2+ii)
-            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(mix.lambdas[k,:,ii])*1.0001,
+                      vmax=np.max(mix.lambdas[k,:,ii])*0.9999)
             ax.set_xticklabels([])
             ax.set_yticklabels([])
             ax.text(0.5,1.05,'Lambda',
@@ -231,7 +241,11 @@ def fig_mofa(mix,kmeans,filename):
         # write eigenvector patches
         for ii in range(int(pshape[0]**2)):
             ax = fig.add_subplot(L+2,L,2*L+ii+1)
-            ax.imshow(u[ii,:].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.imshow(u[ii,:].reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(u[ii,:])*1.0001,
+                      vmax=np.max(u[ii,:])*0.9999)
+
             ax.set_xticklabels([])
             ax.set_yticklabels([])
             ax.text(0.5,1.1,'Eigval = %1.3e' % s[ii],
@@ -247,13 +261,17 @@ def fig_mofa(mix,kmeans,filename):
         mpatch  = mix.means[k].reshape(pshape)
         kmpatch = kmeans[k,:].reshape(pshape)
         ax = fig.add_subplot(L+1,L,L)
-        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(kmpatch)*1.0001,
+                  vmax=np.max(kmpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Initial Mean',
                 transform=ax.transAxes,ha='center',va='center')
         ax = fig.add_subplot(L+1,L,1)
-        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.imshow(mpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(mpatch)*1.0001,
+                  vmax=np.max(mpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Final Mean',
@@ -273,7 +291,10 @@ def fig_mofa(mix,kmeans,filename):
                 fontsize=35)
 
         ax = fig.add_subplot(L+2,L,L+1)
-        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.imshow(mix.psis[k].reshape(pshape),
+                  origin='lower',interpolation='nearest',
+                  vmin=np.min(mix.psis[k])*1.0001,
+                  vmax=np.max(mix.psis[k])*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.05,'Psi',
@@ -281,11 +302,15 @@ def fig_mofa(mix,kmeans,filename):
             
         for ii in range(mix.M):
             ax = fig.add_subplot(L+2,L,L+2+ii)
-            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(mix.lambdas[k,:,ii])*1.0001,
+                      vmax=np.max(mix.lambdas[k,:,ii])*0.9999)
             ax.set_xticklabels([])
             ax.set_yticklabels([])
             ax.text(0.5,1.05,'Lambda',
                     transform=ax.transAxes,ha='center',va='center')
+
         rs = mix.rs[k]
         ind = np.argsort(rs)
         for ii in range(int(L)**2):
@@ -311,13 +336,17 @@ def fig_mofa(mix,kmeans,filename):
         mpatch  = mix.means[k].reshape(pshape)
         kmpatch = kmeans[k,:].reshape(pshape)
         ax = fig.add_subplot(L+1,L,L)
-        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(kmpatch)*1.0001,
+                  vmax=np.max(kmpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Initial Mean',
                 transform=ax.transAxes,ha='center',va='center')
         ax = fig.add_subplot(L+1,L,1)
-        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.imshow(mpatch,origin='lower',interpolation='nearest',
+                  vmin=np.min(mpatch)*1.0001,
+                  vmax=np.max(mpatch)*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.1,'Final Mean',
@@ -337,7 +366,10 @@ def fig_mofa(mix,kmeans,filename):
                 fontsize=35)
 
         ax = fig.add_subplot(L+2,L,L+1)
-        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.imshow(mix.psis[k].reshape(pshape),
+                  origin='lower',interpolation='nearest',
+                  vmin=np.min(mix.psis[k])*1.0001,
+                  vmax=np.max(mix.psis[k])*0.9999)
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.text(0.5,1.05,'Psi',
@@ -345,7 +377,10 @@ def fig_mofa(mix,kmeans,filename):
             
         for ii in range(mix.M):
             ax = fig.add_subplot(L+2,L,L+2+ii)
-            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(mix.lambdas[k,:,ii])*1.0001,
+                      vmax=np.max(mix.lambdas[k,:,ii])*0.9999)
             ax.set_xticklabels([])
             ax.set_yticklabels([])
             ax.text(0.5,1.05,'Lambda',

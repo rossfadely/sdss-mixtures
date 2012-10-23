@@ -8,22 +8,18 @@ from sdss_mixtures_utils import *
 
 import mofa
 
-def make_data_arr(N):
+def make_data_arr():
 
-    NperR = 4*6
-
-    run = [94,4469,5087,8055]
-    field = [130,131,132,130,
-             195,196,197,
-             64,65,66,67,
-             97,98,99,100]
+    run = [8055]
+    field = [97,98,99,100]
+    camcol = [1,2,3,4,5,6]
 
     count = 0
     for r in run:
         for f in field:
             for c in np.arange(6)+1:
                 filename = 'r_flipped_'+str(r)+'_'+str(f)+'_'+str(c)+'.fits'
-                if count>=N:
+                if count>=np.Inf:
                     pass
                 else:
                     if count == 0:
@@ -43,7 +39,7 @@ def make_data_arr(N):
                             count += len(nd[:,0])
                         except:
                             pass
-    return d[:N,:]
+    return d
 
 m = 4
 
@@ -51,9 +47,9 @@ m = 4
 for k in 2**(np.arange(1)+3):
 
     # size of data
-    for n in 2**(np.arange(1)+15):
+    for n in np.arange(1):
 
-        d = make_data_arr(n)
+        d = make_data_arr()
         
         print k,n,d.shape
 
