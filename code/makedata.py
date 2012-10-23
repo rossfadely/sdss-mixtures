@@ -22,31 +22,11 @@ for r in run:
                 
                 try:
                     d , i = get_sdss_data(r,c,f)
-                    td = Patches(d)
-                    ti = Patches(i,flip=False)
-
-                    ind = ti.data == 0
-                    ind = np.any(ind,axis=1)
-                    ind = ind==0
-
-                    td = td.data[ind]
-                    tv = np.var(td,axis=1)
-        
-                    ind = np.argsort(tv)
-                    tv  = tv[ind]
-                    td  = td[ind]
-
-                    Nhi = -(len(td))*0.01
-                    Nlo = -0.05 * Nhi 
-
-                    ind = np.random.permutation(len(td[:Nhi,0]))
-                    ind = ind[:Nlo]
-
-                    out = np.concatenate((td[ind],td[Nhi:]),axis=0)
-                    out = out[np.random.permutation(len(out[:,0])),:]
-                
-                    hdu = pf.PrimaryHDU(out)
+                    obj = Patches(d,i,var_lim=(0.2,0.3),flip=True) # magic numbers 2,3
+                    
+                    print 'successfully read r,c,f',r,c,f
+                    hdu = pf.PrimaryHDU(obj.data)
                     hdu.writeto(filename)
-
+                    assert False
                 except:
                     pass

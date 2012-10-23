@@ -15,7 +15,9 @@ class Patches(object):
 
 
     """
-    def __init__(self, data, pside=8, step=(1,1), patched=False, flip=True):
+    def __init__(self, data, invvar,pside=8, step=(1,1), 
+                 patched=False, flip=True,
+                 var_lim = (0.,np.Inf)):
         self.pside  = pside
         self.pshape = (pside,pside)
         self.step   = step
@@ -24,17 +26,29 @@ class Patches(object):
         if patched:
             self.data = data
         else:
-            self.data = self.patchify(data,step,self.pshape)
-            
+            self.data = self.patchify(data)
+            good      = np.all(self.patchify(invvar) > 0,axis=1) 
+            self.data = self.data[good]
+
+        if var_lim is not (0.,np.Inf):
+            datavar   = np.var(self.data,axis=1)
+            ind       = (datavar > var_lim[0]) & (datavar < var_lim[1])
+            assert np.sum(ind)>0
+            self.data = self.data[ind]
+            print '\nAfter var trim',self.data.shape
+
         self.ndata  = len(self.data[:,0])
 
         if flip==True:
             self.flip_patches()
 
-    def patchify(self, D, step, pshape):
+    def patchify(self, D):
         """
         Make a Ndata by (flattened) pshape, 2D array
         """
+        step    = self.step
+        pshape  = self.pshape   
+
         shape   = ((D.shape[0] - pshape[0])/step[0] + 1,
                    (D.shape[1] - pshape[1])/step[1] + 1) + pshape
         strides = (D.strides[0]*step[0],D.strides[1]*step[1]) + D.strides
