@@ -68,7 +68,7 @@ def fig_eigen(mix,kmeans,filename):
         u,s,v = svd(mix.cov[k])
 
         # write eigenvector patches
-        for ii in range(pshape[0]**2):
+        for ii in range(int(pshape[0]**2)):
             ax = fig.add_subplot(L+1,L,L+ii+1)
             ax.imshow(u[ii,:].reshape(pshape),origin='lower',interpolation='nearest')
             ax.set_xticklabels([])
@@ -80,7 +80,7 @@ def fig_eigen(mix,kmeans,filename):
     pp.close()
 
 
-def fig_patches(mix,patches,filename):
+def fig_patch(mix,patches,filename):
     """
     Plot patches.  For each patch, report likelihood,
     posterior under best component, and total likelihood
@@ -111,7 +111,7 @@ def fig_patches(mix,patches,filename):
     mix.means = mix.means.T
     Nk = len(mix.means[0,:])
 
-    for ii in range(Npatches**2):
+    for ii in range(int(Npatches**2)):
         if type(patches)==int:
             t  = [np.random.multivariate_normal(mix.means[:,k].ravel(),mix.cov[k]) \
                   * mix.amps[k] for k in range(Nk)]
@@ -121,19 +121,19 @@ def fig_patches(mix,patches,filename):
         else:
             patch = patches[inds[ii],:]
 
-        logL, rs = mix._calc_prob(np.array([patch]))
-        loglikes = [mix._log_multi_gauss(k,np.array([patch])) for k in range(Nk)]
-        loglikes = np.array(loglikes).flatten()
-        bestlike = np.argsort(loglikes)
+        #logL, rs = mix._calc_prob(np.array([patch]))
+        #loglikes = [mix._log_multi_gauss(k,np.array([patch])) for k in range(Nk)]
+        #loglikes = np.array(loglikes).flatten()
+        #bestlike = np.argsort(loglikes)
  
         ax = fig.add_subplot(Npatches,Npatches,ii+1)
         ax.imshow(patch.reshape(pshape),origin='lower',interpolation='nearest')
         ax.set_xticklabels([])
         ax.set_yticklabels([])
-        ax.text(0.0,1.05,'$\ln(p(D))$ = %1.1e' % (logL),
-                transform=ax.transAxes,ha='left',va='center')
-        ax.text(0.0,1.15,'$\ln(p(D|k=%d))$ = %1.1e' % (bestlike[-1],loglikes[bestlike[-1]]),
-                transform=ax.transAxes,ha='left',va='center')
+        #ax.text(0.0,1.05,'$\ln(p(D))$ = %1.1e' % (logL),
+        #        transform=ax.transAxes,ha='left',va='center')
+        #ax.text(0.0,1.15,'$\ln(p(D|k=%d))$ = %1.1e' % (bestlike[-1],loglikes[bestlike[-1]]),
+        #        transform=ax.transAxes,ha='left',va='center')
 
     mix.means = mix.means.T
 
@@ -152,5 +152,218 @@ def get_sdss_data(run,camcol,field):
     return d.data,d.invvar
 
 
+ 
+
+def fig_mofa(mix,kmeans,filename):
+    """
+    Plot mean,lambdas,psis, high resp. patches, and draws 
+    for each component of MOFA, out to single PDF
+    """
+    if filename[-4:]!='.pdf' : filename += '.pdf'
+    pp = PdfPages(filename)
+
+    pshape = (np.sqrt(len(mix.means[0].ravel())),
+              np.sqrt(len(mix.means[0].ravel())))
+    L = pshape[0]
+    factor = 2.0          # size of one side of one panel
+    lbdim = 0.5 * factor  # size of left/bottom margin
+    trdim = 0.5 * factor  # size of top/right margin
+    whspace = 0.05        # w/hspace size
+    plotdim = factor * L + factor * (L - 1.) * whspace
+    dim = lbdim + plotdim + trdim
+    lb = lbdim / dim
+    tr = (lbdim + plotdim) / dim
+    pl.gray()
+
+    for k in range(mix.K):
+        # first eigenpatches
+        fig = pl.figure(figsize=(dim, dim + L))
+        fig.subplots_adjust(left=lb, bottom=lb, right=tr, top=tr,
+                            wspace=whspace, hspace=whspace)
+
+        # write mean patches
+        mpatch  = mix.means[k].reshape(pshape)
+        kmpatch = kmeans[k,:].reshape(pshape)
+        ax = fig.add_subplot(L+1,L,L)
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Initial Mean',
+                transform=ax.transAxes,ha='center',va='center')
+        ax = fig.add_subplot(L+1,L,1)
+        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Final Mean',
+                transform=ax.transAxes,ha='center',va='center')
 
 
+        # write some info
+        ax = fig.add_subplot(L+2,L,3)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Component = %d' % k,
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+        ax = fig.add_subplot(L+2,L,6)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Amp = %0.3f' % mix.amps[k],
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+
+        ax = fig.add_subplot(L+2,L,L+1)
+        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.05,'Psi',
+                transform=ax.transAxes,ha='center',va='center')
+            
+        for ii in range(mix.M):
+            ax = fig.add_subplot(L+2,L,L+2+ii)
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.text(0.5,1.05,'Lambda',
+                    transform=ax.transAxes,ha='center',va='center')
+
+
+        u,s,v = svd(mix.covs[k])
+
+        # write eigenvector patches
+        for ii in range(int(pshape[0]**2)):
+            ax = fig.add_subplot(L+2,L,2*L+ii+1)
+            ax.imshow(u[ii,:].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.text(0.5,1.1,'Eigval = %1.3e' % s[ii],
+                    transform=ax.transAxes,ha='center',va='center')
+        pp.savefig()
+
+        # now high rs patches
+        fig = pl.figure(figsize=(dim, dim + L))
+        fig.subplots_adjust(left=lb, bottom=lb, right=tr, top=tr,
+                            wspace=whspace, hspace=whspace)
+
+        # write mean patches
+        mpatch  = mix.means[k].reshape(pshape)
+        kmpatch = kmeans[k,:].reshape(pshape)
+        ax = fig.add_subplot(L+1,L,L)
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Initial Mean',
+                transform=ax.transAxes,ha='center',va='center')
+        ax = fig.add_subplot(L+1,L,1)
+        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Final Mean',
+                transform=ax.transAxes,ha='center',va='center')
+
+
+        # write some info
+        ax = fig.add_subplot(L+2,L,3)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Component = %d' % k,
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+        ax = fig.add_subplot(L+2,L,6)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Amp = %0.3f' % mix.amps[k],
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+
+        ax = fig.add_subplot(L+2,L,L+1)
+        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.05,'Psi',
+                transform=ax.transAxes,ha='center',va='center')
+            
+        for ii in range(mix.M):
+            ax = fig.add_subplot(L+2,L,L+2+ii)
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.text(0.5,1.05,'Lambda',
+                    transform=ax.transAxes,ha='center',va='center')
+        rs = mix.rs[k]
+        ind = np.argsort(rs)
+        for ii in range(int(L)**2):
+            ax = fig.add_subplot(L+2,L,2*L+ii+1)
+            ax.imshow(mix.data[ind[-ii-1]].reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(mpatch),vmax=np.max(mpatch))
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.text(0.5,1.1,'rs = %0.3f' % rs[ind[-ii-1]],
+                    transform=ax.transAxes,ha='center',va='center')
+
+        pp.savefig()
+
+
+
+        # finally draws
+        fig = pl.figure(figsize=(dim, dim + L))
+        fig.subplots_adjust(left=lb, bottom=lb, right=tr, top=tr,
+                            wspace=whspace, hspace=whspace)
+
+        # write mean patches
+        mpatch  = mix.means[k].reshape(pshape)
+        kmpatch = kmeans[k,:].reshape(pshape)
+        ax = fig.add_subplot(L+1,L,L)
+        ax.imshow(kmpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Initial Mean',
+                transform=ax.transAxes,ha='center',va='center')
+        ax = fig.add_subplot(L+1,L,1)
+        ax.imshow(mpatch,origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.1,'Final Mean',
+                transform=ax.transAxes,ha='center',va='center')
+
+
+        # write some info
+        ax = fig.add_subplot(L+2,L,3)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Component = %d' % k,
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+        ax = fig.add_subplot(L+2,L,6)
+        ax.set_axis_off()
+        ax.text(0.0,0.5,'Amp = %0.3f' % mix.amps[k],
+                transform=ax.transAxes,ha='left',va='center',
+                fontsize=35)
+
+        ax = fig.add_subplot(L+2,L,L+1)
+        ax.imshow(mix.psis[k].reshape(pshape),origin='lower',interpolation='nearest')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.text(0.5,1.05,'Psi',
+                transform=ax.transAxes,ha='center',va='center')
+            
+        for ii in range(mix.M):
+            ax = fig.add_subplot(L+2,L,L+2+ii)
+            ax.imshow(mix.lambdas[k,:,ii].reshape(pshape),origin='lower',interpolation='nearest')
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            ax.text(0.5,1.05,'Lambda',
+                    transform=ax.transAxes,ha='center',va='center')
+
+        for ii in range(int(L)**2):
+            t  = np.random.multivariate_normal(mix.means[k],mix.covs[k])
+            t  = np.array(t)
+            patch = t
+ 
+            ax = fig.add_subplot(L+2,L,2*L+ii+1)
+            ax.imshow(patch.reshape(pshape),
+                      origin='lower',interpolation='nearest',
+                      vmin=np.min(mpatch),vmax=np.max(mpatch))
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+ 
+
+        pp.savefig()
+
+    pp.close()
