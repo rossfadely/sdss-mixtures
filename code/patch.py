@@ -15,7 +15,7 @@ class Patches(object):
 
 
     """
-    def __init__(self, data, pside=7, step=(1,1), patched=False, flip=True):
+    def __init__(self, data, pside=8, step=(1,1), patched=False, flip=True):
         self.pside  = pside
         self.pshape = (pside,pside)
         self.step   = step
