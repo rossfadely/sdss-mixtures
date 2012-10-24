@@ -16,8 +16,8 @@ class Patches(object):
 
     """
     def __init__(self, data, invvar,pside=8, step=(1,1), 
-                 patched=False, flip=True,
-                 var_lim = (0.,np.Inf)):
+                 patched=False, flip=True,save_unflipped=False,
+                 rand_flip=False,var_lim = (0.,np.Inf)):
         self.pside  = pside
         self.pshape = (pside,pside)
         self.step   = step
@@ -37,10 +37,19 @@ class Patches(object):
             self.data = self.data[ind]
             print '\nAfter var trim',self.data.shape
 
-        self.ndata  = len(self.data[:,0])
+        self.ndata  = self.data.shape[0]
 
-        if flip==True:
+        if save_unflipped:
+            self.unflipped = self.data.copy()
+            
+        # Decorate this dummy
+        if flip:
+            self.centroid()
             self.flip_patches()
+            self.centroid()
+
+        if rand_flip:
+            self.rand_flip()
 
     def patchify(self, D):
         """
@@ -63,15 +72,7 @@ class Patches(object):
         """
         Compute centroids of patches
         """
-        x  = np.array([])
-        for ii in range(self.pside):
-            x = np.append(x,np.arange(1,self.pside+1))
-        x -= np.mean(x)
-
-        y  = np.array([])
-        for ii in range(self.pside):
-            y = np.append(y,np.zeros(self.pside)+ii+1)
-        y -= np.mean(y)
+        x, y = self.xy_grid_vals()
 
         denom = np.sum(self.data, axis=1)
         self.xc = np.sum(x * self.data,axis=1) / denom
@@ -83,7 +84,8 @@ class Patches(object):
         """
         pside = self.pside
         for ii in range(pside):
-            self.data[ind,ii*pside:pside*(ii+1)] = np.fliplr(self.data[ind,ii*pside:pside*(ii+1)])
+            self.data[ind,ii*pside:pside*(ii+1)] = \
+                np.fliplr(self.data[ind,ii*pside:pside*(ii+1)])
 
     def flip_xandy(self,ind):
         """
@@ -98,14 +100,14 @@ class Patches(object):
         pside = self.pside
         t = self.data[ind]
         t = np.reshape(t,(t.shape[0],pside,pside))
-        self.data[ind] = np.reshape(np.transpose(t,(0,2,1)),(self.data[ind].shape))
+        self.data[ind] = np.reshape(np.transpose(t,(0,2,1)),
+                                    (self.data[ind].shape))
 
     def flip_patches(self):
         """
         Flip the patches so centroids lie in the 45-90 degree (from 'x' axis)
         eighth of the patch.
         """
-        self.centroid()
         
         ind_x = (self.xc >= 0)
         ind_y = (self.yc >= 0)
@@ -152,7 +154,6 @@ class Patches(object):
         self.flip_y(ind)
         self.nflips[6] = len(self.data[ind])
 
-        self.centroid()
 
 
     def get_1D_patches(self,x):
@@ -179,11 +180,33 @@ class Patches(object):
         else:
             return self.data[x,:].reshape(len(x),self.pside,self.pside)
 
+    def xy_grid_vals(self):
+        """
+        Generate values of x,y grid
+        """
+        x  = np.array([])
+        for ii in range(self.pside):
+            x = np.append(x,np.arange(1,self.pside+1))
+        x -= np.mean(x)
 
+        y  = np.array([])
+        for ii in range(self.pside):
+            y = np.append(y,np.zeros(self.pside)+ii+1)
+        y -= np.mean(y)
+        
+        return x,y
 
+    def rand_flip(self):
+        """
+        Take patches in self.data, do random flips
+        """
+        # Generate random centroids
+        x, y    = self.xy_grid_vals()
+        self.xc = x[np.random.randint(0,len(x),self.ndata)] 
+        self.yc = y[np.random.randint(0,len(y),self.ndata)] 
 
-
-
+        # Now flip the patches
+        self.flip_patches()
 
 
 

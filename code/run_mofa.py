@@ -10,40 +10,35 @@ import mofa
 
 def make_data_arr(N):
 
-    NperR = 4*6
-
-    run = [94,4469,5087,8055]
-    field = [130,131,132,130,
-             195,196,197,
-             64,65,66,67,
-             97,98,99,100]
+    base = '/home/rfadely/sdss-mixtures/sdss_data/'
+    fs = np.loadtxt(base+'fieldinfo.dat')
 
     count = 0
-    for r in run:
-        for f in field:
-            for c in np.arange(6)+1:
-                filename = 'r_flipped_'+str(r)+'_'+str(f)+'_'+str(c)+'.fits'
-                if count>=N:
-                    pass
-                else:
-                    if count == 0:
-                        try:
-                            f = pf.open(filename)
-                            d = f[0].data
-                            f.close()
-                            count += len(d[:,0])
-                        except:
-                            pass
-                    else:
-                        try:
-                            f = pf.open(filename)
-                            nd = f[0].data
-                            d = np.concatenate((d,nd))
-                            f.close()
-                            count += len(nd[:,0])
-                        except:
-                            pass
-    return d[:N,:]
+    i = 0
+    while count < N:
+
+        if i==fs.shape[0]:
+            assert False, 'Not enough fields processed - '+\
+            'need %d have %d' % (N,data.shape[0])
+
+        filename = base+'rband_flipped_'+str(int(fs[i,0]))+\
+            '_'+str(int(fs[i,2]))+'_'+str(int(fs[i,1]))+'.fits'
+
+        f = pf.open(filename)
+        d = f[0].data
+        f.close()
+
+        if count==0:
+            data = d
+        else:
+            data = np.concatenate((data,d))
+        
+        count += d.shape[0]
+        i += 1
+
+    return data[:N,:]
+
+
 
 m = 4
 
@@ -52,8 +47,8 @@ for k in 2**(np.arange(1)+3):
 
     # size of data
     for n in 2**(np.arange(1)+18):
-
-        d = make_data_arr(n)
+        N = 240000
+        d = make_data_arr(N)
         
         print k,n,d.shape
 
@@ -64,5 +59,5 @@ for k in 2**(np.arange(1)+3):
         mix.run_em()
         t = time.time() - t0
         
-        fig_mofa(mix,imeans,'mofa_ppcainit_2.18_8_4.pdf')
+        fig_mofa(mix,imeans,'mofa_var(0.2-0.3)_2.18_8_4.pdf')
         
