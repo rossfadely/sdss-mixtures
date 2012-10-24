@@ -141,15 +141,6 @@ def fig_patch(mix,patches,filename):
     fig.savefig(filename,format='pdf')
 
     
-def get_sdss_data(run,camcol,field):
-    """Call Tractor functions to get data, invvar images
-    of a given SDSS field"""
-    import sdss #Tractor import
-
-    d = sdss.get_tractor_image_dr9(run,camcol,field,'r',psf='dg')
-    d = d[0]
-
-    return d.data,d.invvar
 
 
  

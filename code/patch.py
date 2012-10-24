@@ -30,7 +30,7 @@ class Patches(object):
             good      = np.all(self.patchify(invvar) > 0,axis=1) 
             self.data = self.data[good]
 
-        if var_lim is not (0.,np.Inf):
+        if var_lim!=(0.,np.Inf):
             datavar   = np.var(self.data,axis=1)
             ind       = (datavar > var_lim[0]) & (datavar < var_lim[1])
             assert np.sum(ind)>0

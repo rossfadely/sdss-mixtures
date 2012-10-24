@@ -1,3 +1,4 @@
+
 import numpy as np
 import pyfits as pf
 import time
@@ -43,7 +44,7 @@ def make_data_arr(N):
 m = 4
 
 # number of K
-for k in 2**(np.arange(1)+3):
+for k in 2**(np.arange(1)+4):
 
     # size of data
     for n in 2**(np.arange(1)+18):
@@ -58,6 +59,10 @@ for k in 2**(np.arange(1)+3):
         imeans = mix.means.copy()
         mix.run_em()
         t = time.time() - t0
+        mix.rs = 0
+        mix.latents = 0
+        mix.latent_covs = 0
         
-        fig_mofa(mix,imeans,'mofa_var(0.2-0.3)_2.18_8_4.pdf')
-        
+        f = open('mofa_var(0.2-0.3)_2.18.16.4.pkl','wb')
+        cPickle.dump(mix,f)
+        f.close()
