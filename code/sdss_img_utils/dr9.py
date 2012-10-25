@@ -1,11 +1,9 @@
 import os
 import pyfits
-#from astrometry.util.fits import fits_table
 import numpy as np
 
 from common import *
 from dr8 import *
-#from yanny import *
 
 class DR9(DR8):
 

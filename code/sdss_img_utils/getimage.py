@@ -6,25 +6,7 @@ import numpy as np
 
 from dr9 import *
 from classutils import *
-
-#from rfutils import *
-#from rfstuff.miscutils import *
-#from rfstuff.pyfits_utils import *
-#from rfstuff.run_command import *
-#from rfstuff.yanny import *
-#from rfstuff.common import *
-#from rfstuff.dr7 import *
-#from rfstuff.dr8 import *
-#from rfstuff.dr9 import *
 from scipy.ndimage.morphology import binary_dilation
-
-#from astrometry.sdss.dr7 import * #DR7, band_name, band_index
-#from astrometry.sdss.dr8 import * #DR7, band_name, band_index
-#from astrometry.sdss.dr9 import * #DR7, band_name, band_index
-#from astrometry.util.yanny import *
-
-
-
 
 
 def get_image_dr8(run, camcol, field, bandname, sdss=None,
