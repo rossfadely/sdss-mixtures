@@ -2,9 +2,7 @@ import numpy as np
 import pyfits as pf
 import scipy as sp
 
-import sdss #Tractor import
-
-from sdss_mixtures_utils import *
+from sdss_img_utils import getimage
 from patch import *
 
 np.random.seed(100)
@@ -13,7 +11,7 @@ def get_sdss_data(run,camcol,field):
     """Call Tractor functions to get data, invvar images
     of a given SDSS field"""
 
-    d = sdss.get_tractor_image_dr9(run,camcol,field,'r',psf='dg')
+    d = getimage.get_image_dr9(run,camcol,field,'r',psf='dg')
     d = d[0]
 
     return d.data,d.invvar
