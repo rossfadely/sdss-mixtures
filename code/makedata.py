@@ -2,18 +2,16 @@ import numpy as np
 import pyfits as pf
 import scipy as sp
 
-import sdss #Tractor import
-
-from sdss_mixtures_utils import *
+from sdss_img_utils import getimage
 from patch import *
 
 np.random.seed(100)
 
 def get_sdss_data(run,camcol,field):
-    """Call Tractor functions to get data, invvar images
+    """Call modified Tractor functions to get data, invvar images
     of a given SDSS field"""
 
-    d = sdss.get_tractor_image_dr9(run,camcol,field,'r',psf='dg')
+    d = getimage.get_image_dr9(run,camcol,field,'r',psf='dg')
     d = d[0]
 
     return d.data,d.invvar
@@ -50,6 +48,7 @@ def make_patches(r,c,f):
 
 
 # get field list
+# this file lives in the sdss_data dir in git repo
 base = '/home/rfadely/sdss-mixtures/sdss_data/'
 f = pf.open(base+'dr9fields.fits')
 fields = f[1].data
