@@ -69,8 +69,12 @@ def get_image_dr8(run, camcol, field, bandname, sdss=None,
 	print 'xi:', xi.min(), xi.max(), 'vs [0,', sw, ']'
 	yi = np.round(frame.skyyi).astype(int)
 	print 'yi:', yi.min(), yi.max(), 'vs [0,', sh, ']'
-	assert(all(xi >= 0) and all(xi < sw))
-	assert(all(yi >= 0) and all(yi < sh))
+	if ((all(xi >= 0) and all(xi < sw))!=True):
+		print 'xi fail on field,run,camcol',field,run,camcol
+		return None,None
+	if ((all(yi >= 0) and all(yi < sh))!=True):
+                print 'yi fail on field,run,camcol',field,run,camcol
+		return None,None
 	XI,YI = np.meshgrid(xi, yi)
 	# Nearest-neighbour interpolation -- we just need this for approximate invvar.
 	bigsky = skyim[YI,XI]
