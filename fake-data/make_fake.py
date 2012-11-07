@@ -7,7 +7,7 @@ class Fake(object):
     """
     Make some (centered) fake data, corrupt `Pcorrupt`
     percentage by first multiplying then adding, spit 
-    out to fits.
+    out to fits if desired.
     """
     def __init__(self,filename=None,pside=8,K=1,N=2**18,Pcorrupt=0.005,add=10.0,
                  allflux=10,hwhm=1.5,mult=2.0,gain=100.,rdns=0.025,
