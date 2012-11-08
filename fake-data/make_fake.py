@@ -5,13 +5,13 @@ import pyfits as pf
 
 class Fake(object):
     """
-    Make some (centered) fake data, corrupt `Pcorrupt`
+    Make some fake data, corrupt `Pcorrupt`
     percentage by first multiplying then adding, spit 
     out to fits if desired.
     """
     def __init__(self,filename=None,pside=8,K=1,N=2**18,Pcorrupt=0.005,add=10.0,
                  allflux=10,hwhm=1.5,mult=2.0,gain=100.,rdns=0.025,
-                 column=2):
+                 column=2,randcenters=True):
         self.D = pside**2
         self.N = N
         self.K = K
@@ -24,12 +24,13 @@ class Fake(object):
         self.Ncorr = np.floor(Pcorrupt * self.N)
         self.column = column
         self.allflux = allflux
+        self.randcenters = randcenters
 
         self.make_clean()
         self.corrupt() #==True
 
         if filename!=None:
-            hdu = pf.PrimaryHdu(self.data)
+            hdu = pf.PrimaryHDU(self.data)
             hdu.writeto(filename)
 
     def make_clean(self):
@@ -83,9 +84,22 @@ class Fake(object):
         """
         Add a gaussian to the center of 
         """
-        gauss = np.exp(-0.5 * (self.xgrid**2.+self.ygrid**2.)
-                        / self.hwhm**2) / np.sqrt(2. * np.pi * self.hwhm**2)
-        self.data += gauss[None,:]
+        if self.randcenters:
+            x0 = np.random.rand(self.N) * self.pside - self.pside/2.
+            y0 = np.random.rand(self.N) * self.pside - self.pside/2.
+            x0 = np.atleast_2d(x0)
+            y0 = np.atleast_2d(y0)
+            x0 = np.tile(x0.T,(1,64))
+            y0 = np.tile(y0.T,(1,64))
+            gauss = np.exp(-0.5 * (((self.xgrid.T[None,:]-x0)**2.+
+                                    (self.ygrid.T[None,:]-y0)**2.) 
+                                   / self.hwhm**2) / 
+                            np.sqrt(2. * np.pi * self.hwhm**2))
+            self.data += gauss
+        else:
+            gauss = np.exp(-0.5 * (self.xgrid**2.+self.ygrid**2.)
+                           / self.hwhm**2) / np.sqrt(2. * np.pi * self.hwhm**2)
+            self.data += gauss[None,:]
 
 
 
