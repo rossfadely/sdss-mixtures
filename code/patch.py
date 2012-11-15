@@ -15,11 +15,11 @@ class Patches(object):
 
 
     """
-    def __init__(self, data, invvar,pside=8, step=(1,1), 
-                 patched=False, flip=True,save_unflipped=False,
-                 rand_flip=False,var_lim = (0.,np.Inf)):
-        self.pside  = pside
-        self.pshape = (pside,pside)
+    def __init__(self, data, invvar,pshape=(8,8), step=(1,1), 
+                 patched=False, flip=True, save_unflipped=False,
+                 rand_flip=False, var_lim=(0.,np.Inf)):
+        self.pside  = pshape[0]
+        self.pshape = pshape
         self.step   = step
         self.nflips = np.empty(7)
 
@@ -27,6 +27,9 @@ class Patches(object):
             self.data = data
         else:
             self.data = self.patchify(data)
+            ys, xs    = np.mgrid[0:data.shape[0],0:data.shape[1]]
+            self.xs   = self.patchify(xs)
+            self.ys   = self.patchify(ys)
             good      = np.all(self.patchify(invvar) > 0,axis=1) 
             self.data = self.data[good]
 
@@ -35,6 +38,8 @@ class Patches(object):
             ind       = (datavar > var_lim[0]) & (datavar < var_lim[1])
             assert np.sum(ind)>0
             self.data = self.data[ind]
+            self.xs   = self.xs[ind]
+            self.ys   = self.ys[ind]
             print '\nAfter var trim',self.data.shape
 
         self.ndata  = self.data.shape[0]
@@ -44,6 +49,7 @@ class Patches(object):
             
         # Decorate this dummy
         if flip:
+            assert pshape[0]==pshape[1], 'Flipping set for rect. patches'
             self.centroid()
             self.flip_patches()
             self.centroid()
