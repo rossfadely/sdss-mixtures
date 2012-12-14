@@ -17,7 +17,7 @@ class Patches(object):
     """
     def __init__(self, data, invvar,pshape=(8,8), step=(1,1), 
                  patched=False, flip=True, save_unflipped=False,
-                 rand_flip=False, var_lim=(0.,np.Inf)):
+                 rand_flip=False, get_xy=False, var_lim=(0.,np.Inf)):
         self.pside  = pshape[0]
         self.pshape = pshape
         self.step   = step
@@ -27,11 +27,18 @@ class Patches(object):
             self.data = data
         else:
             self.data = self.patchify(data)
+
+        if get_xy:
             ys, xs    = np.mgrid[0:data.shape[0],0:data.shape[1]]
             self.xs   = self.patchify(xs)
             self.ys   = self.patchify(ys)
-            good      = np.all(self.patchify(invvar) > 0,axis=1) 
-            self.data = self.data[good]
+        
+        self.indices = self.patchify(
+            np.arange(data.shape[0]*data.shape[1],
+                      dtype='int').reshape(data.shape[0],
+                                           data.shape[1]))
+        good      = np.all(self.patchify(invvar) > 0,axis=1) 
+        self.data = self.data[good]
 
         if var_lim!=(0.,np.Inf):
             datavar   = np.var(self.data,axis=1)
@@ -68,7 +75,7 @@ class Patches(object):
                    (D.shape[1] - pshape[1])/step[1] + 1) + pshape
         strides = (D.strides[0]*step[0],D.strides[1]*step[1]) + D.strides
         blocks  = ast(D, shape= shape, strides= strides)
-        blocks  = blocks.flatten()
+        blocks  = blocks.ravel()
         shape   = (shape[0]*shape[1],pshape[0]*pshape[1])
         strides = (blocks.itemsize*pshape[0]*pshape[1],blocks.itemsize)
 
