@@ -20,13 +20,13 @@ def get_sdss_data(run,camcol,field):
 
 def make_patches(r,c,f):
     base = '/home/rfadely/sdss-mixtures/sdss_data/'
-    tail = str(r)+'_'+str(f)+'_'+str(c)+'.fits'
+    tail = str(r)+'_'+str(f)+'_'+str(c)
     
     yflip = 'rband_flipped_'
     nflip = 'rband_unflipped_'
 
     try:
-        f = pf.open(base+yflip+tail)
+        f = pf.open(base+yflip+tail+'.fits')
         N = f[0].data.shape[0]
         f.close()
         return N
@@ -35,16 +35,28 @@ def make_patches(r,c,f):
         d , i = get_sdss_data(r,c,f)
         if d==None:
             return None
+
+        # screw up a column
+        ys, xs = np.mgrid[0:d.shape[0],0:d.shape[1]]
+        ind = xs == 1935
+        d[ind] *= 1.0
+        d[ind] += 0.0
+
         obj = Patches(d,i,var_lim=(0.2,0.3), # magic numbers 2,3
                       flip=True,
                       save_unflipped=True) 
         # write flipped patches
-        hdu = pf.PrimaryHDU(obj.data)
-        hdu.writeto(base+yflip+tail)
+        #hdu = pf.PrimaryHDU(obj.data)
+        #hdu.writeto(base+yflip+tail+'.fits')
         # write unflipped patches
-        hdu = pf.PrimaryHDU(obj.unflipped)
-        hdu.writeto(base+nflip+tail)
-        
+        #hdu = pf.PrimaryHDU(obj.unflipped)
+        #hdu.writeto(base+nflip+tail+'.fits')
+
+        out = np.zeros((obj.data.shape[0],2))
+        out[:,0] = obj.xs.min(axis=1)
+        out[:,1] = obj.ys.min(axis=1)
+        np.savetxt(base+'xy'+tail+'.dat',out)
+
         return obj.data.shape[0]
 
 
@@ -82,11 +94,11 @@ while N < Ndata:
             out = np.array([[r,c,f]])
         else:
             out = np.concatenate((out,np.array([[r,c,f]])),axis=0)
-            np.savetxt(base+'fieldinfo_0.2-0.3.dat',out)
         N += tN
         print '\nsuccess %d patches in iter %d\n' % (tN,i)
         print 'now have %d patches in iter %d\n\n\n' % (N,i)
 
     i += 1
     
+np.savetxt(base+'fieldinfo_0.2-0.3.dat',out)
 

@@ -8,7 +8,8 @@ import cPickle
 
 from mofa_plotting import *
 
-f = open('mofa_var(0.2-0.3)_2.18.8.4.pkl','rb')
+base='/home/rfadely/sdss-mixtures/'
+f = open(base+'sdss_data/mofa_var(0.2-0.3)_2.18.64.4.pkl','rb')
 mix = cPickle.load(f)
 f.close()
 
@@ -17,10 +18,10 @@ f.close()
 print 'done reading pickle'
 
 L = 16
-ind = np.random.permutation(mix.data.shape[0])
-ind = ind[:L**2]
+#ind = np.random.permutation(mix.data.shape[0])
+#ind = ind[:L**2]
 
-np.savetxt('patchinds.dat',ind)
+#np.savetxt('patchinds.dat',ind)
 
-fig_patches(L,8,'patches_0293.png',data=mix.data[ind])
-fig_patches(L,8,'patches_9835.png',mix=mix)
+#fig_patches(L,8,'patches_0293.png',data=mix.data[ind])
+fig_patches(L,8,base+'plots/patches_k128.png',mix=mix)
