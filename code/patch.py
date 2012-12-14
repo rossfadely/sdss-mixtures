@@ -56,7 +56,7 @@ class Patches(object):
             
         # Decorate this dummy
         if flip:
-            assert pshape[0]==pshape[1], 'Flipping set for rect. patches'
+            assert pshape[0]==pshape[1], 'Flipping set for sq. patches'
             self.centroid()
             self.flip_patches()
             self.centroid()
